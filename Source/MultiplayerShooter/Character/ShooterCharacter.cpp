@@ -55,6 +55,7 @@ void AShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	// Replicates only for the owner of the character
 	DOREPLIFETIME_CONDITION(AShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME(AShooterCharacter, Health);
 }
 
 void AShooterCharacter::OnRep_ReplicatedMovement()
@@ -385,6 +386,11 @@ void AShooterCharacter::HideCameraIfCharacterClose()
 			Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = false;
 		}
 	}
+}
+
+void AShooterCharacter::OnRep_Health()
+{
+
 }
 
 void AShooterCharacter::SetOverlappingWeapon(AWeapon* Weapon)
