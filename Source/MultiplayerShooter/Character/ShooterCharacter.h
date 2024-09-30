@@ -15,6 +15,7 @@ class UWidgetComponent;
 class AWeapon;
 class UCombatComponent;
 class UAnimMontage;
+class AShooterPlayerController;
 
 UCLASS()
 class MULTIPLAYERSHOOTER_API AShooterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -113,6 +114,8 @@ private:
 
 	UFUNCTION()
 	void OnRep_Health();
+
+	AShooterPlayerController* ShooterPlayerController;
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);

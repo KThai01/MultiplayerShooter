@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ShooterAnimInstance.h"
 #include "MultiplayerShooter/MultiplayerShooter.h"
+#include "MultiplayerShooter/PlayerController/ShooterPlayerController.h"
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -69,6 +70,11 @@ void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	ShooterPlayerController = Cast<AShooterPlayerController>(Controller);
+	if (ShooterPlayerController)
+	{
+		ShooterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
 }
 
 void AShooterCharacter::Tick(float DeltaTime)
