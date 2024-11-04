@@ -15,6 +15,7 @@
 #include "MultiplayerShooter/MultiplayerShooter.h"
 #include "MultiplayerShooter/PlayerController/ShooterPlayerController.h"
 #include "MultiplayerShooter/GameMode/ShooterGameMode.h"
+#include "TimerManager.h"
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -67,10 +68,30 @@ void AShooterCharacter::OnRep_ReplicatedMovement()
 	TimeSinceLastMovementReplication = 0.f;
 }
 
-void AShooterCharacter::Elim_Implementation()
+void AShooterCharacter::Elim()
+{
+	MulticastElim();
+	GetWorldTimerManager().SetTimer(
+		ElimTimer,
+		this,
+		&AShooterCharacter::ElimTimerFinished,
+		ElimDelay
+	);
+}
+
+void AShooterCharacter::MulticastElim_Implementation()
 {
 	bElimmed = true;
 	PlayElimMontage();
+}
+
+void AShooterCharacter::ElimTimerFinished()
+{
+	AShooterGameMode* ShooterGameMode = GetWorld()->GetAuthGameMode<AShooterGameMode>();
+	if (ShooterGameMode)
+	{
+		ShooterGameMode->RequestRespawn(this, Controller);
+	}
 }
 
 void AShooterCharacter::BeginPlay()
