@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "MultiplayerShooter/ShooterTypes/TurningInPlace.h"
 #include "MultiplayerShooter/Interfaces/InteractWithCrosshairsInterface.h"
+#include "Components/TimelineComponent.h"
 #include "ShooterCharacter.generated.h"
 
 // forward declarations
@@ -132,6 +133,29 @@ private:
 	float ElimDelay = 3.f;
 
 	void ElimTimerFinished();
+
+	/**
+	* Dissolve Effect
+	*/
+
+	UPROPERTY(VisibleAnywhere)
+	UTimelineComponent* DissolveTimeline;
+	FOnTimelineFloat DissolveTrack;
+
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* DissolveCurve;
+
+	UFUNCTION()
+	void UpdateDissolveMaterial(float DissolveValue);
+	void StartDissolve();
+
+	// Dynamic Instance we can change at runtime
+	UPROPERTY(VisibleAnywhere, Category = Elim)
+	UMaterialInstanceDynamic* DynamicDissolveMaterialInstance;
+
+	// Material instance set on Blueprint, used with dynamic material instance
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* DissolveMaterialInstance;
 
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
