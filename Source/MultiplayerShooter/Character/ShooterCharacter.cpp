@@ -72,6 +72,10 @@ void AShooterCharacter::OnRep_ReplicatedMovement()
 
 void AShooterCharacter::Elim()
 {
+	if (Combat && Combat->EquippedWeapon)
+	{
+		Combat->EquippedWeapon->Dropped();
+	}
 	MulticastElim();
 	GetWorldTimerManager().SetTimer(
 		ElimTimer,
@@ -86,6 +90,7 @@ void AShooterCharacter::MulticastElim_Implementation()
 	bElimmed = true;
 	PlayElimMontage();
 
+	// Start dissolve effect
 	if (DissolveMaterialInstance)
 	{
 		DynamicDissolveMaterialInstance = UMaterialInstanceDynamic::Create(DissolveMaterialInstance, this);
@@ -94,6 +99,17 @@ void AShooterCharacter::MulticastElim_Implementation()
 		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Glow"), 200.f);
 	}
 	StartDissolve();
+
+	// Disable character movement when Elimmed
+	GetCharacterMovement()->DisableMovement(); // Disables WASD Movement
+	GetCharacterMovement()->StopMovementImmediately(); // Disables character rotation with camera
+	if (ShooterPlayerController)
+	{
+		DisableInput(ShooterPlayerController);
+	}
+	// Disable collision
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AShooterCharacter::ElimTimerFinished()
