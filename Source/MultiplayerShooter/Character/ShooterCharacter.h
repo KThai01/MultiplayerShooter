@@ -127,6 +127,7 @@ private:
 	UFUNCTION()
 	void OnRep_Health();
 
+	UPROPERTY()
 	AShooterPlayerController* ShooterPlayerController;
 
 	bool bElimmed = false;
@@ -174,6 +175,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	USoundCue* ElimBotSound;
 
+	UPROPERTY()
 	class AShooterPlayerState* ShooterPlayerState;
 
 public:

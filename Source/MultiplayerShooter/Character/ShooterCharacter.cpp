@@ -530,6 +530,7 @@ void AShooterCharacter::PollInit()
 		if (ShooterPlayerState)
 		{
 			ShooterPlayerState->AddToScore(0.f);
+			ShooterPlayerState->AddToDefeats(0);
 		}
 	}
 }
