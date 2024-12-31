@@ -101,6 +101,10 @@ void AShooterCharacter::Destroyed()
 
 void AShooterCharacter::MulticastElim_Implementation()
 {
+	if (ShooterPlayerController)
+	{
+		ShooterPlayerController->SetHUDWeaponAmmo(0);
+	}
 	bElimmed = true;
 	PlayElimMontage();
 
