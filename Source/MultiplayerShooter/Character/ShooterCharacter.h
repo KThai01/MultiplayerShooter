@@ -7,6 +7,7 @@
 #include "MultiplayerShooter/ShooterTypes/TurningInPlace.h"
 #include "MultiplayerShooter/Interfaces/InteractWithCrosshairsInterface.h"
 #include "Components/TimelineComponent.h"
+#include "MultiplayerShooter/ShooterTypes/CombatState.h"
 #include "ShooterCharacter.generated.h"
 
 // forward declarations
@@ -82,7 +83,7 @@ private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* Combat;
 
 	UFUNCTION(Server, Reliable) // Setting reliable guarantees execution
@@ -200,4 +201,5 @@ public:
 	FORCEINLINE bool IsElimmed() const { return bElimmed; }
 	FORCEINLINE float GetHealth() const { return Health;  }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+	ECombatState GetCombatState() const;
 };

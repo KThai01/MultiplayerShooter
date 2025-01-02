@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "MultiplayerShooter/HUD/ShooterHUD.h"
 #include "MultiplayerShooter/Weapon/WeaponTypes.h"
+#include "MultiplayerShooter/ShooterTypes/CombatState.h"
 #include "CombatComponent.generated.h"
 
 #define TRACE_LENGTH 80000
@@ -28,6 +29,9 @@ public:
 
 	void EquipWeapon(AWeapon* WeaponToEquip);
 	void Reload();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishRelading();
 protected:
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);
@@ -54,6 +58,8 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
+
+	void HandleReload();
 
 private:
 	UPROPERTY()
@@ -130,6 +136,12 @@ private:
 	int32 StartingARAmmo = 30;
 
 	void InitializeCarriedAmmo();
+
+	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	ECombatState CombatState = ECombatState::ECS_Unoccupied;
+
+	UFUNCTION()
+	void OnRep_CombatState();
 
 public:	
 		
