@@ -52,6 +52,9 @@ protected:
 
 	void SetHUDCrosshairs(float DeltaTime);
 
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
+
 private:
 	UPROPERTY()
 	AShooterCharacter* Character;
