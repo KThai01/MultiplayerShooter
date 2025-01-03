@@ -9,6 +9,7 @@
 
 class UWidgetComponent;
 class AShooterCharacter;
+class USoundCue;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -67,6 +68,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	bool bAutomatic = true;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* EquipSound;
 
 protected:
 	virtual void BeginPlay() override;
