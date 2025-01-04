@@ -16,7 +16,19 @@ class MULTIPLAYERSHOOTER_API AShooterGameMode : public AGameMode
 {
 	GENERATED_BODY()
 public:
-	virtual void PlayerEliminated(AShooterCharacter* ElimmedCharacter, AShooterPlayerController* VictimController, AShooterPlayerController* AttackerController);
+	AShooterGameMode();
+	virtual void Tick(float DeltaTime) override;
 
+	virtual void PlayerEliminated(AShooterCharacter* ElimmedCharacter, AShooterPlayerController* VictimController, AShooterPlayerController* AttackerController);
 	virtual void RequestRespawn(ACharacter* ElimmedCharacter, AController* ElimmedController);
+
+	UPROPERTY(EditDefaultsOnly)
+	float WarmupTime = 10.f;
+
+	float LevelStartingTime = 0.f;
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	float CountdownTime = 0.f;
 };
