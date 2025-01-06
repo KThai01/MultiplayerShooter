@@ -8,6 +8,12 @@
 
 class AShooterCharacter;
 class AShooterPlayerController;
+
+namespace MatchState
+{
+	extern MULTIPLAYERSHOOTER_API const FName Cooldown; // Match duration has been reached, display winner, begin cooldown timer
+}
+
 /**
  * 
  */
@@ -27,6 +33,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float MatchTime = 120.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float CooldownTime = 10.f;
 
 	float LevelStartingTime = 0.f;
 protected:
