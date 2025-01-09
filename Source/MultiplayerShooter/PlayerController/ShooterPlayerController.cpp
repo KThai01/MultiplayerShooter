@@ -11,6 +11,7 @@
 #include "MultiplayerShooter/GameMode/ShooterGameMode.h"
 #include "MultiplayerShooter/HUD/Announcement.h"
 #include "Kismet/GameplayStatics.h"
+#include "MultiplayerShooter/ShooterComponents/CombatComponent.h"
 
 void AShooterPlayerController::BeginPlay()
 {
@@ -354,5 +355,11 @@ void AShooterPlayerController::HandleCooldown()
 			ShooterHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
 			ShooterHUD->Announcement->InfoText->SetText(FText());
 		}
+	}
+	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn());
+	if (ShooterCharacter && ShooterCharacter->GetCombat())
+	{
+		ShooterCharacter->bDisableGameplay = true;
+		ShooterCharacter->GetCombat()->FireButtonPressed(false);
 	}
 }
