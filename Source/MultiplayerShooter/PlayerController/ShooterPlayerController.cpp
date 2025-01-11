@@ -9,9 +9,12 @@
 #include "MultiplayerShooter/Character/ShooterCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "MultiplayerShooter/GameMode/ShooterGameMode.h"
+#include "MultiplayerShooter/PlayerState/ShooterPlayerState.h"
 #include "MultiplayerShooter/HUD/Announcement.h"
 #include "Kismet/GameplayStatics.h"
 #include "MultiplayerShooter/ShooterComponents/CombatComponent.h"
+#include "MultiplayerShooter/Weapon/Weapon.h"
+#include "MultiplayerShooter/GameState/ShooterGameState.h"
 
 void AShooterPlayerController::BeginPlay()
 {
@@ -225,6 +228,7 @@ void AShooterPlayerController::SetHUDAnnouncementCountdown(float CountdownTime)
 
 void AShooterPlayerController::SetHUDTime()
 {
+	/*
 	float TimeLeft = 0.f;
 	if (MatchState == MatchState::WaitingToStart) TimeLeft = WarmupTime - GetServerTime() + LevelStartingTime;
 	else if (MatchState == MatchState::InProgress) TimeLeft = WarmupTime + MatchTime - GetServerTime() + LevelStartingTime;
@@ -233,6 +237,40 @@ void AShooterPlayerController::SetHUDTime()
 
 	if (HasAuthority())
 	{
+		ShooterGameMode = ShooterGameMode == nullptr ? Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this)) : ShooterGameMode;
+		if (ShooterGameMode)
+		{
+			SecondsLeft = FMath::CeilToInt(ShooterGameMode->GetCountdownTime() + LevelStartingTime);
+		}
+	}
+
+	if (CountdownInt != SecondsLeft)
+	{
+		if (MatchState == MatchState::WaitingToStart || MatchState == MatchState::Cooldown)
+		{
+			SetHUDAnnouncementCountdown(TimeLeft);
+		}
+		if (MatchState == MatchState::InProgress)
+		{
+			SetHUDMatchCountdown(TimeLeft);
+		}
+	}
+
+	CountdownInt = SecondsLeft;
+	*/
+	float TimeLeft = 0.f;
+	if (MatchState == MatchState::WaitingToStart) TimeLeft = WarmupTime - GetServerTime() + LevelStartingTime;
+	else if (MatchState == MatchState::InProgress) TimeLeft = WarmupTime + MatchTime - GetServerTime() + LevelStartingTime;
+	else if (MatchState == MatchState::Cooldown) TimeLeft = CooldownTime + WarmupTime + MatchTime - GetServerTime() + LevelStartingTime;
+	uint32 SecondsLeft = FMath::CeilToInt(TimeLeft);
+
+	if (HasAuthority())
+	{
+		if (ShooterGameMode == nullptr)
+		{
+			ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
+			LevelStartingTime = ShooterGameMode->LevelStartingTime;
+		}
 		ShooterGameMode = ShooterGameMode == nullptr ? Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this)) : ShooterGameMode;
 		if (ShooterGameMode)
 		{
@@ -353,7 +391,36 @@ void AShooterPlayerController::HandleCooldown()
 			ShooterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
 			FString AnnouncementText("New Match Starts In:");
 			ShooterHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
-			ShooterHUD->Announcement->InfoText->SetText(FText());
+
+			AShooterGameState* ShooterGameState = Cast<AShooterGameState>(UGameplayStatics::GetGameState(this));
+			AShooterPlayerState* ShooterPlayerState = GetPlayerState<AShooterPlayerState>();
+			if (ShooterGameState && ShooterPlayerState)
+			{
+				TArray<AShooterPlayerState*> TopPlayers = ShooterGameState->TopScoringPlayers;
+				FString InfoTextString;
+				if (TopPlayers.Num() == 0)
+				{
+					InfoTextString = FString("There is no winner.");
+				}
+				else if (TopPlayers.Num() == 1 && TopPlayers[0] == ShooterPlayerState)
+				{
+					InfoTextString = FString("You are the winner!");
+				}
+				else if (TopPlayers.Num() == 1)
+				{
+					InfoTextString = FString::Printf(TEXT("Winner: \n%s"), *TopPlayers[0]->GetPlayerName());
+				}
+				else if (TopPlayers.Num() > 1)
+				{
+					InfoTextString = FString("Players tied for the win:\n");
+					for (auto TiedPlayer : TopPlayers)
+					{
+						InfoTextString.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
+					}
+				}
+
+				ShooterHUD->Announcement->InfoText->SetText(FText::FromString(InfoTextString));
+			}
 		}
 	}
 	AShooterCharacter* ShooterCharacter = Cast<AShooterCharacter>(GetPawn());

@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
 #include "MultiplayerShooter/PlayerState/ShooterPlayerState.h"
+#include "MultiplayerShooter/GameState/ShooterGameState.h"
 
 namespace MatchState
 {
@@ -50,7 +51,13 @@ void AShooterGameMode::Tick(float DeltaTime)
 		CountdownTime = CooldownTime + WarmupTime + MatchTime - GetWorld()->GetTimeSeconds() + LevelStartingTime;
 		if (CountdownTime < 0.f)
 		{
-			RestartGame();
+			// RestartGame();
+			UWorld* World = GetWorld();
+			if (World)
+			{
+				bUseSeamlessTravel = true;
+				World->ServerTravel(FString("/Game/Maps/NA?listen"));
+			}
 		}
 	}
 }
@@ -72,12 +79,17 @@ void AShooterGameMode::OnMatchStateSet()
 
 void AShooterGameMode::PlayerEliminated(AShooterCharacter* ElimmedCharacter, AShooterPlayerController* VictimController, AShooterPlayerController* AttackerController)
 {
+	if (AttackerController == nullptr || AttackerController->PlayerState == nullptr) return;
+	if (VictimController == nullptr || VictimController->PlayerState == nullptr) return;
 	AShooterPlayerState* AttackerPlayerState = AttackerController ? Cast<AShooterPlayerState>(AttackerController->PlayerState) : nullptr;
 	AShooterPlayerState* VictimPlayerState = VictimController ? Cast<AShooterPlayerState>(VictimController->PlayerState) : nullptr;
 
-	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState)
+	AShooterGameState* ShooterGameState = GetGameState<AShooterGameState>();
+
+	if (AttackerPlayerState && AttackerPlayerState != VictimPlayerState && ShooterGameState)
 	{
 		AttackerPlayerState->AddToScore(1.f);
+		ShooterGameState->UpdateTopScore(AttackerPlayerState);
 	}
 	if (VictimPlayerState)
 	{

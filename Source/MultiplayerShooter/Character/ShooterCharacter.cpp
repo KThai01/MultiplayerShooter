@@ -99,7 +99,10 @@ void AShooterCharacter::Destroyed()
 	{
 		ElimBotComponent->DestroyComponent();
 	}
-	if (Combat && Combat->EquippedWeapon)
+
+	AShooterGameMode* ShooterGameMode = Cast<AShooterGameMode>(UGameplayStatics::GetGameMode(this));
+	bool bMatchNotInProgress = ShooterGameMode && ShooterGameMode->GetMatchState() != MatchState::InProgress;
+	if (Combat && Combat->EquippedWeapon && bMatchNotInProgress)
 	{
 		Combat->EquippedWeapon->Destroy();
 	}
@@ -124,13 +127,13 @@ void AShooterCharacter::MulticastElim_Implementation()
 	}
 	StartDissolve();
 
-	// Disable character movement when Elimmed
-	GetCharacterMovement()->DisableMovement(); // Disables WASD Movement
-	GetCharacterMovement()->StopMovementImmediately(); // Disables character rotation with camera
-	if (ShooterPlayerController)
+	// Disable character movement
+	bDisableGameplay = true;
+	if (Combat)
 	{
-		bDisableGameplay = true;
+		Combat->FireButtonPressed(false);
 	}
+
 
 	// Disable collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
