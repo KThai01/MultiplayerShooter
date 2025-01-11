@@ -16,6 +16,7 @@ void AShooterHUD::AddCharacterOverlay()
 	APlayerController* PlayerController = GetOwningPlayerController();
 	if (PlayerController && CharacterOverlayClass)
 	{
+		if (CharacterOverlay != nullptr) return;
 		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
 		CharacterOverlay->AddToViewport();
 	}
@@ -26,6 +27,7 @@ void AShooterHUD::AddAnnouncement()
 	APlayerController* PlayerController = GetOwningPlayerController();
 	if (PlayerController && AnnouncementClass && Announcement == nullptr)
 	{
+		if (Announcement != nullptr) return;
 		Announcement = CreateWidget<UAnnouncement>(PlayerController, AnnouncementClass);
 		Announcement->AddToViewport();
 	}
